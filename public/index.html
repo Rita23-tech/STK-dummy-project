@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Send Rita Money 💸</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #0d0d1a;
+      color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .card {
+      background: #1a1a2e;
+      padding: 2.5rem;
+      border-radius: 20px;
+      width: 90%;
+      max-width: 400px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    .emoji { font-size: 3rem; margin-bottom: 1rem; }
+
+    h1 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    p {
+      color: #9999bb;
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-size: 0.8rem;
+      color: #9999bb;
+      margin-bottom: 0.3rem;
+      margin-top: 1rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.8rem;
+      border-radius: 10px;
+      border: 1px solid #2e2e4d;
+      background: #0d0d1a;
+      color: #fff;
+      font-size: 1rem;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #00c853;
+    }
+
+    button {
+      margin-top: 1.5rem;
+      width: 100%;
+      padding: 0.9rem;
+      border: none;
+      border-radius: 10px;
+      background: #00c853;
+      color: #000;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover { background: #00e676; }
+    button:disabled { background: #444; color: #888; cursor: not-allowed; }
+
+    #message {
+      margin-top: 1.2rem;
+      font-size: 0.9rem;
+      min-height: 1.5rem;
+    }
+
+    .success { color: #00c853; }
+    .error { color: #ff4fa3; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    
+    <h1>Send Rita Money</h1>
+    <p>Enter your M-Pesa number and amount </p>
+    <p> A PIN prompt will appear on your phone.</p>
+
+    <label for="phone">M-Pesa Phone Number</label>
+    <input
+      type="tel"
+      id="phone"
+      placeholder="e.g. 254712345678"
+    />
+
+    <label for="amount">Amount (KES)</label>
+    <input
+      type="number"
+      id="amount"
+      placeholder="e.g. 100"
+      min="1"
+    />
+
+    <button id="payBtn" onclick="sendMoney()">Send Money</button>
+    <p id="message"></p>
+  </div>
+
+  <script>
+    async function sendMoney() {
+      const phone = document.getElementById('phone').value.trim()
+      const amount = document.getElementById('amount').value.trim()
+      const btn = document.getElementById('payBtn')
+      const message = document.getElementById('message')
+
+      // Basic validation
+      if (!phone || !amount) {
+        message.className = 'error'
+        message.textContent = 'Please fill in both fields.'
+        return
+      }
+
+      // Disable button while waiting
+      btn.disabled = true //makes it that user doesnt click send multiple times while waitig for the send to activate
+      btn.textContent = 'Sending...'
+      message.textContent = ''
+
+      try {
+        const response = await fetch('/pay', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ phone, amount })
+        })
+
+        const data = await response.json()
+
+        if (data.success) {
+          message.className = 'success'
+          message.textContent = '✅ Check your phone and enter your M-Pesa PIN!'
+        } else {
+          message.className = 'error'
+          message.textContent = '❌ Error: ' + data.error
+        }
+      } catch (err) {
+        message.className = 'error'
+        message.textContent = '❌ Something went wrong. Try again.'
+      } finally {
+        btn.disabled = false
+        btn.textContent = 'Send Money 💸'
+      }
+    }
+  </script>
+
+</body>
+</html>
