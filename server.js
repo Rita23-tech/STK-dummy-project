@@ -65,24 +65,7 @@ app.post('/pay', async (req, res) => {   //this will be the point where the fron
     res.json({ success: true, data: response.data })
   } catch (error) {
     res.json({ success: false, error: error.message })
-  }
-
-  {
-  "version": 2,
-  "builds": [
-    {
-      "src": "server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "server.js"
-    }
-  ]
-}
-
+  } 
 })
 
 app.listen(3000, () => {
