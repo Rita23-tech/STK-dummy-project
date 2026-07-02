@@ -1,12 +1,16 @@
 const express = require('express') //this is how noe imports libraries. same concept as python
 const axios = require('axios')
+const path = require('path')  // add this at the top with your other requires
 require('dotenv').config()
 
 const app = express()
 app.use(express.json())
-app.use(express.static('public')) /* what this does is that, it tells js to serve any 
+app.use(express.static(path.join(__dirname, 'public'))) /* what this does is that, it tells js to serve any 
 into the public folder direcly, ie where public.html is located. 
 so when someone visits the local host, it opens up the inex.hrml  */
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'))
+})
 
 // Step 1: Get access token from Safaricom
 async function getAccessToken() {
